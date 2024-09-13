@@ -1,7 +1,6 @@
-﻿using System;
-using TerraFX.Interop;
-using static TerraFX.Interop.Kernel32;
-using static TerraFX.Interop.Windows;
+using System;
+using TerraFX.Interop.Windows;
+using static TerraFX.Interop.Windows.Windows;
 
 namespace TestApp
 {

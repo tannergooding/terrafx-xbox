@@ -7,11 +7,11 @@
   IgnorableNamespaces="uap mp">
 
   <Identity
-    Name="289359cd-15d7-47bf-a2d8-0e77a1753bca"
+    Name="b12fba99-857e-495f-8a8c-61b575596331"
     Publisher="CN=tagoo"
     Version="1.0.0.0" />
 
-  <mp:PhoneIdentity PhoneProductId="289359cd-15d7-47bf-a2d8-0e77a1753bca" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="b12fba99-857e-495f-8a8c-61b575596331" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>TestApp</DisplayName>

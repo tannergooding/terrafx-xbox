@@ -1,0 +1,7 @@
+-target net8.0
+-input 10.0.26100.0
+-input "D:\Users\tagoo\.nuget\packages\microsoft.windowsappsdk\1.6.240821007-preview2\lib\uap10.0.18362\Microsoft.Foundation.winmd" "D:\Users\tagoo\.nuget\packages\microsoft.windowsappsdk\1.6.240821007-preview2\lib\uap10.0.18362\Microsoft.Graphics.winmd" "D:\Users\tagoo\.nuget\packages\microsoft.windowsappsdk\1.6.240821007-preview2\lib\uap10.0.18362\Microsoft.UI.winmd"
+-output "Generated Files\\CsWinRT"
+
+-exclude Windows
+-exclude Microsoft

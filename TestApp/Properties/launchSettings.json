@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "TestApp": {
+      "commandName": "MsixPackage",
+      "remoteDebugEnabled": true,
+      "authenticationMode": "Universal",
+      "remoteDebugMachine": "XBOX"
+    }
+  }
+}

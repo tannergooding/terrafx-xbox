@@ -1,6 +1,6 @@
-﻿using static DirectX.Detail;
+using static DirectX.Detail;
 
-namespace TerraFX.Interop
+namespace TerraFX.Interop.DirectX
 {
     public static unsafe class PIX
     {

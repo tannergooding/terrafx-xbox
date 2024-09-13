@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using Windows.ApplicationModel;
-using static TerraFX.Interop.Windows;
-using static TerraFX.Utilities.ExceptionUtilities;
+using static TerraFX.Interop.Windows.Windows;
 
-namespace TerraFX.Interop
+namespace TerraFX.Interop.DirectX
 {
     public static unsafe class DX
     {
@@ -40,7 +39,7 @@ namespace TerraFX.Interop
 
                 if (endOfFile > int.MaxValue)
                 {
-                    ThrowIOException();
+                    throw new IOException();
                 }
 
                 var size = (int)endOfFile;

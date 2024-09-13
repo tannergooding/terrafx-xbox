@@ -1,29 +1,30 @@
-﻿using System;
-using System.Diagnostics;
+using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using TerraFX.Interop;
+using TerraFX.Interop.DirectX;
+using TerraFX.Interop.Windows;
 using Windows.Storage;
-using static TerraFX.Interop.D3D_PRIMITIVE_TOPOLOGY;
-using static TerraFX.Interop.D3D_ROOT_SIGNATURE_VERSION;
-using static TerraFX.Interop.D3D12;
-using static TerraFX.Interop.D3D12_CLEAR_FLAGS;
-using static TerraFX.Interop.D3D12_COMMAND_LIST_TYPE;
-using static TerraFX.Interop.D3D12_DESCRIPTOR_HEAP_FLAGS;
-using static TerraFX.Interop.D3D12_DESCRIPTOR_HEAP_TYPE;
-using static TerraFX.Interop.D3D12_DESCRIPTOR_RANGE_TYPE;
-using static TerraFX.Interop.D3D12_HEAP_FLAGS;
-using static TerraFX.Interop.D3D12_HEAP_TYPE;
-using static TerraFX.Interop.D3D12_INPUT_CLASSIFICATION;
-using static TerraFX.Interop.D3D12_PRIMITIVE_TOPOLOGY_TYPE;
-using static TerraFX.Interop.D3D12_RESOURCE_STATES;
-using static TerraFX.Interop.D3D12_ROOT_SIGNATURE_FLAGS;
-using static TerraFX.Interop.D3D12_SHADER_VISIBILITY;
-using static TerraFX.Interop.D3DCompiler;
-using static TerraFX.Interop.DX;
-using static TerraFX.Interop.DXGI_FORMAT;
-using static TerraFX.Interop.PIX;
+using static TerraFX.Interop.DirectX.D3DCOMPILE;
+using static TerraFX.Interop.DirectX.D3D_PRIMITIVE_TOPOLOGY;
+using static TerraFX.Interop.DirectX.D3D_ROOT_SIGNATURE_VERSION;
+using static TerraFX.Interop.DirectX.D3D12_CLEAR_FLAGS;
+using static TerraFX.Interop.DirectX.D3D12_COMMAND_LIST_TYPE;
+using static TerraFX.Interop.DirectX.D3D12_DESCRIPTOR_HEAP_FLAGS;
+using static TerraFX.Interop.DirectX.D3D12_DESCRIPTOR_HEAP_TYPE;
+using static TerraFX.Interop.DirectX.D3D12_DESCRIPTOR_RANGE_TYPE;
+using static TerraFX.Interop.DirectX.D3D12_HEAP_FLAGS;
+using static TerraFX.Interop.DirectX.D3D12_HEAP_TYPE;
+using static TerraFX.Interop.DirectX.D3D12_INPUT_CLASSIFICATION;
+using static TerraFX.Interop.DirectX.D3D12_PRIMITIVE_TOPOLOGY_TYPE;
+using static TerraFX.Interop.DirectX.D3D12_RESOURCE_STATES;
+using static TerraFX.Interop.DirectX.D3D12_ROOT_SIGNATURE_FLAGS;
+using static TerraFX.Interop.DirectX.D3D12_SHADER_VISIBILITY;
+using static TerraFX.Interop.DirectX.DirectX;
+using static TerraFX.Interop.DirectX.DX;
+using static TerraFX.Interop.DirectX.DXGI_FORMAT;
+using static TerraFX.Interop.DirectX.PIX;
+using static TerraFX.Interop.Windows.IID;
 using static TestApp.DeviceResources;
 
 namespace TestApp
@@ -39,7 +40,7 @@ namespace TestApp
 
         #region Fields
         // Constant buffers must be 256-byte aligned.
-        private static readonly uint AlignedConstantBufferSize = (uint)((Marshal.SizeOf<ModelViewProjectionConstantBuffer>() + 255) & ~255);
+        private static readonly uint AlignedConstantBufferSize = (uint)((Unsafe.SizeOf<ModelViewProjectionConstantBuffer>() + 255) & ~255);
 
         // Cached pointer to device resources.
         private DeviceResources _deviceResources;
@@ -227,11 +228,11 @@ namespace TestApp
 
             // Create a root signature with a single constant buffer slot.
             {
-                D3D12_DESCRIPTOR_RANGE range;
-                D3D12_ROOT_PARAMETER parameter;
+                Unsafe.SkipInit(out D3D12_DESCRIPTOR_RANGE range);
+                Unsafe.SkipInit(out D3D12_ROOT_PARAMETER parameter);
 
-                D3D12_DESCRIPTOR_RANGE.Init(&range, D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
-                D3D12_ROOT_PARAMETER.InitAsDescriptorTable(&parameter, 1, &range, D3D12_SHADER_VISIBILITY_VERTEX);
+                range.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
+                parameter.InitAsDescriptorTable(1, &range, D3D12_SHADER_VISIBILITY_VERTEX);
 
                 var rootSignatureFlags =
                     D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT | // Only the input assembler stage needs access to the constant buffer.
@@ -240,8 +241,8 @@ namespace TestApp
                     D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
                     D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS;
 
-                D3D12_ROOT_SIGNATURE_DESC descRootSignature;
-                D3D12_ROOT_SIGNATURE_DESC.Init(&descRootSignature, 1, &parameter, 0, null, rootSignatureFlags);
+                Unsafe.SkipInit(out D3D12_ROOT_SIGNATURE_DESC descRootSignature);
+                descRootSignature.Init(1, &parameter, 0, null, rootSignatureFlags);
 
                 ID3DBlob* pSignature = null;
                 ID3DBlob* pError = null;
@@ -277,9 +278,9 @@ namespace TestApp
                 {
 #if DEBUG
                     // Enable better shader debugging with the graphics debugging tools.
-                    var compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+                    uint compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 #else
-                    var compileFlags = 0u;
+                    uint compileFlags = 0u;
 #endif
                     fixed (char* pixelShaderFileName = @"Content\SamplePixelShader.hlsl")
                     fixed (char* vertexShaderFileName = @"Content\SampleVertexShader.hlsl")
@@ -393,7 +394,7 @@ namespace TestApp
                         new VertexPositionColor { pos = new Vector3(0.5f, 0.5f, 0.5f), color = new Vector3(1.0f, 1.0f, 1.0f) },
                     };
 
-                    uint vertexBufferSize = (uint)(Marshal.SizeOf<VertexPositionColor>() * 8);
+                    uint vertexBufferSize = (uint)(Unsafe.SizeOf<VertexPositionColor>() * 8);
 
                     // Create the vertex buffer resource in the GPU's default heap and copy vertex data into it using the upload heap.
                     // The upload resource must not be released until after the GPU has finished using it.
@@ -600,7 +601,7 @@ namespace TestApp
 
                     // Create vertex/index buffer views.
                     _vertexBufferView.BufferLocation = VertexBuffer->GetGPUVirtualAddress();
-                    _vertexBufferView.StrideInBytes = (uint)Marshal.SizeOf<VertexPositionColor>();
+                    _vertexBufferView.StrideInBytes = (uint)Unsafe.SizeOf<VertexPositionColor>();
                     _vertexBufferView.SizeInBytes = vertexBufferSize;
 
                     _indexBufferView.BufferLocation = IndexBuffer->GetGPUVirtualAddress();
@@ -692,7 +693,7 @@ namespace TestApp
 
                 fixed (ModelViewProjectionConstantBuffer* constantBufferData = &_constantBufferData)
                 {
-                    Buffer.MemoryCopy(constantBufferData, destination, Marshal.SizeOf<ModelViewProjectionConstantBuffer>(), Marshal.SizeOf<ModelViewProjectionConstantBuffer>());
+                    Buffer.MemoryCopy(constantBufferData, destination, Unsafe.SizeOf<ModelViewProjectionConstantBuffer>(), Unsafe.SizeOf<ModelViewProjectionConstantBuffer>());
                 }
             }
         }

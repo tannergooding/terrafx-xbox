@@ -1,34 +1,35 @@
-﻿using System;
+using System;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using TerraFX.Interop;
+using TerraFX.Interop.DirectX;
+using TerraFX.Interop.Windows;
 using Windows.Foundation;
 using Windows.Graphics.Display;
 using Windows.UI.Core;
-using static TerraFX.Interop.D3D_FEATURE_LEVEL;
-using static TerraFX.Interop.D3D12;
-using static TerraFX.Interop.D3D12_COMMAND_LIST_TYPE;
-using static TerraFX.Interop.D3D12_COMMAND_QUEUE_FLAGS;
-using static TerraFX.Interop.D3D12_DESCRIPTOR_HEAP_FLAGS;
-using static TerraFX.Interop.D3D12_DESCRIPTOR_HEAP_TYPE;
-using static TerraFX.Interop.D3D12_DSV_DIMENSION;
-using static TerraFX.Interop.D3D12_DSV_FLAGS;
-using static TerraFX.Interop.D3D12_FENCE_FLAGS;
-using static TerraFX.Interop.D3D12_HEAP_FLAGS;
-using static TerraFX.Interop.D3D12_HEAP_TYPE;
-using static TerraFX.Interop.D3D12_RESOURCE_FLAGS;
-using static TerraFX.Interop.D3D12_RESOURCE_STATES;
-using static TerraFX.Interop.DX;
-using static TerraFX.Interop.DXGI;
-using static TerraFX.Interop.DXGI_ADAPTER_FLAG;
-using static TerraFX.Interop.DXGI_ALPHA_MODE;
-using static TerraFX.Interop.DXGI_FORMAT;
-using static TerraFX.Interop.DXGI_MODE_ROTATION;
-using static TerraFX.Interop.DXGI_SCALING;
-using static TerraFX.Interop.DXGI_SWAP_EFFECT;
-using static TerraFX.Interop.Kernel32;
-using static TerraFX.Interop.Windows;
-using static TerraFX.Utilities.ExceptionUtilities;
+using WinRT;
+using static TerraFX.Interop.DirectX.D3D_FEATURE_LEVEL;
+using static TerraFX.Interop.DirectX.D3D12_COMMAND_LIST_TYPE;
+using static TerraFX.Interop.DirectX.D3D12_COMMAND_QUEUE_FLAGS;
+using static TerraFX.Interop.DirectX.D3D12_DESCRIPTOR_HEAP_FLAGS;
+using static TerraFX.Interop.DirectX.D3D12_DESCRIPTOR_HEAP_TYPE;
+using static TerraFX.Interop.DirectX.D3D12_DSV_DIMENSION;
+using static TerraFX.Interop.DirectX.D3D12_DSV_FLAGS;
+using static TerraFX.Interop.DirectX.D3D12_FENCE_FLAGS;
+using static TerraFX.Interop.DirectX.D3D12_HEAP_FLAGS;
+using static TerraFX.Interop.DirectX.D3D12_HEAP_TYPE;
+using static TerraFX.Interop.DirectX.D3D12_RESOURCE_FLAGS;
+using static TerraFX.Interop.DirectX.D3D12_RESOURCE_STATES;
+using static TerraFX.Interop.DirectX.DirectX;
+using static TerraFX.Interop.DirectX.DX;
+using static TerraFX.Interop.DirectX.DXGI;
+using static TerraFX.Interop.DirectX.DXGI_ADAPTER_FLAG;
+using static TerraFX.Interop.DirectX.DXGI_ALPHA_MODE;
+using static TerraFX.Interop.DirectX.DXGI_FORMAT;
+using static TerraFX.Interop.DirectX.DXGI_MODE_ROTATION;
+using static TerraFX.Interop.DirectX.DXGI_SCALING;
+using static TerraFX.Interop.DirectX.DXGI_SWAP_EFFECT;
+using static TerraFX.Interop.Windows.IID;
+using static TerraFX.Interop.Windows.Windows;
 
 namespace TestApp
 {
@@ -61,7 +62,7 @@ namespace TestApp
         // CPU/GPU Synchronization.
         private ID3D12Fence* _fence;
         private FenceValues_e__FixedBuffer _fenceValues;
-        private IntPtr _fenceEvent;
+        private HANDLE _fenceEvent;
 
         // Cached reference to the Window.
         private CoreWindow _window;
@@ -88,7 +89,7 @@ namespace TestApp
             _currentFrame = 0;
             _screenViewport = default;
             _rtvDescriptorSize = 0;
-            _fenceEvent = IntPtr.Zero;
+            _fenceEvent = HANDLE.NULL;
             _backBufferFormat = backBufferFormat;
             _depthBufferFormat = depthBufferFormat;
             _fenceValues = default;
@@ -671,7 +672,7 @@ namespace TestApp
                 _fenceEvent = CreateEvent(null, FALSE, FALSE, null);
                 if (_fenceEvent == IntPtr.Zero)
                 {
-                    ThrowExternalExceptionForLastHRESULT(nameof(CreateEvent));
+                    throw new ExternalException(nameof(CreateEvent), Marshal.GetLastSystemError());
                 }
             }
             finally
@@ -755,10 +756,10 @@ namespace TestApp
 
                 try
                 {
-                    ThrowIfFailed(nameof(IDXGIFactory2._CreateSwapChainForCoreWindow),
+                    ThrowIfFailed(nameof(IDXGIFactory2.CreateSwapChainForCoreWindow),
                         DxgiFactory->CreateSwapChainForCoreWindow(
                             (IUnknown*)CommandQueue,                               // Swap chains need a reference to the command queue in DirectX 12.
-                            (IUnknown*)Marshal.GetIUnknownForObject(_window),
+                            (IUnknown*)MarshalInspectable<CoreWindow>.FromManaged(_window),
                             &swapChainDesc,
                             null,
                             &swapChain
@@ -805,7 +806,7 @@ namespace TestApp
                     throw new Exception();
             }
 
-            ThrowIfFailed(nameof(IDXGISwapChain1._SetRotation), SwapChain->SetRotation(displayRotation));
+            ThrowIfFailed(nameof(IDXGISwapChain1.SetRotation), SwapChain->SetRotation(displayRotation));
 
             // Create render target views of the swap chain back buffer.
             {
@@ -819,7 +820,7 @@ namespace TestApp
 
                     for (var n = 0u; n < FrameCount; n++)
                     {
-                        ThrowIfFailed(nameof(IDXGISwapChain._GetBuffer), SwapChain->GetBuffer(n, &iid, (void**)&renderTargets[n]));
+                        ThrowIfFailed(nameof(IDXGISwapChain.GetBuffer), SwapChain->GetBuffer(n, &iid, (void**)&renderTargets[n]));
                         D3DDevice->CreateRenderTargetView(_renderTargets[(int)n], null, rtvDescriptor);
                         rtvDescriptor.ptr = (UIntPtr)((byte*)rtvDescriptor.ptr + _rtvDescriptorSize);
 
@@ -839,7 +840,7 @@ namespace TestApp
 
                 ID3D12Resource * depthStencil;
                 var iid = IID_ID3D12Resource;
-                ThrowIfFailed(nameof(ID3D12Device._CreateCommittedResource), D3DDevice->CreateCommittedResource(
+                ThrowIfFailed(nameof(ID3D12Device.CreateCommittedResource), D3DDevice->CreateCommittedResource(
                     &depthHeapProperties,
                     D3D12_HEAP_FLAG_NONE,
                     &depthResourceDesc,

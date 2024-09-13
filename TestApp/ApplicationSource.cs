@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using Windows.ApplicationModel.Core;
 
 namespace TestApp
 {
-    public sealed class ApplicationSource : IFrameworkViewSource
+    public sealed partial class ApplicationSource : IFrameworkViewSource
     {
         // The main function is only used to initialize our IFrameworkView class.
         [MTAThread]

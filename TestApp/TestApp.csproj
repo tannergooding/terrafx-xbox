@@ -1,97 +1,37 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>TestApp</AssemblyName>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows10.0.26100.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <UseUwp>true</UseUwp>
+    <UseUwpTools>true</UseUwpTools>
+    <Platforms>x86;x64;arm64</Platforms>
+    <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
     <DefaultLanguage>en-US</DefaultLanguage>
-    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <FileAlignment>512</FileAlignment>
-    <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
-    <NoWarn>2008</NoWarn>
-    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
-    <OutputType>AppContainerExe</OutputType>
-    <PackageCertificateKeyFile>TestApp_TemporaryKey.pfx</PackageCertificateKeyFile>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <PlatformTarget>$(Platform)</PlatformTarget>
-    <ProjectGuid>{05D1F690-8EB9-4E91-A0A5-750B3A402F17}</ProjectGuid>
-    <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
-    <RestoreSources>
-      https://api.nuget.org/v3/index.json;
-      https://blob.terrafx.dev/nuget/index.json;
-    </RestoreSources>
-    <RootNamespace>TestApp</RootNamespace>
-    <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformMinVersion>10.0.18362.0</TargetPlatformMinVersion>
-    <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.18362.0</TargetPlatformVersion>
-    <UseDotNetNativeToolchain>false</UseDotNetNativeToolchain>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <WindowsXamlEnableOverview>true</WindowsXamlEnableOverview>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM'" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM64'" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM64'" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'" />
-  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-    <DebugSymbols>true</DebugSymbols>
-    <DefineConstants>DEBUG;$(DefineConstants)</DefineConstants>
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Platform)' == 'x86' OR '$(Platform)' == 'ARM'">
-    <Prefer32Bit>true</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
-    <VisualStudioVersion>14.0</VisualStudioVersion>
+    <PublishAot>true</PublishAot>
+    <PublishProfile>win-$(Platform).pubxml</PublishProfile>
+    <DisableRuntimeMarshalling>true</DisableRuntimeMarshalling>
+    <EnableMsixTooling>true</EnableMsixTooling>
+
+    <!--
+      This is a non-XAML app (just a simple CoreApplication app), so the XAML compiler is not needed.
+      Disabling this property fixes that, and also removes the Windows SDK check for the 26100 SDK.
+      Not importing the XAML compiler removes some unnecessary declared project capabilities. Note:
+      this property should not be disabled if custom PRI resources are needed by the application.      
+    -->
+    <EnableXamlCompilerTargetsForUwpApps>false</EnableXamlCompilerTargetsForUwpApps>
+    <WindowsSdkPackageVersion>10.0.26100.38</WindowsSdkPackageVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <AppxManifest Include="Package.appxmanifest" SubType="Designer" />
+    <PackageReference Include="TerraFX.Interop.Windows" Version="10.0.26100" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App.cs" />
-    <Compile Include="App1Main.cs" />
-    <Compile Include="ApplicationSource.cs" />
-    <Compile Include="Common\DeviceResources.cs" />
-    <Compile Include="Common\DirectXHelper.cs" />
-    <Compile Include="Common\DisplayMetrics.cs" />
-    <Compile Include="Common\ScreenRotation.cs" />
-    <Compile Include="Common\StepTimer.cs" />
-    <Compile Include="Content\ModelViewProjectionConstantBuffer.cs" />
-    <Compile Include="Content\SceneRenderer.cs" />
-    <Compile Include="Content\VertexPositionColor.cs" />
-    <Compile Include="Helpers\DirectX.Detail.cs" />
-    <Compile Include="Helpers\PIX.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Update="Content\SamplePixelShader.hlsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Content\SampleVertexShader.hlsl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="Assets\LockScreenLogo.scale-200.png" />
-    <Content Include="Assets\SplashScreen.scale-200.png" />
-    <Content Include="Assets\Square150x150Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
-    <Content Include="Assets\StoreLogo.png" />
-    <Content Include="Assets\Wide310x150Logo.scale-200.png" />
-    <Content Include="Content\SamplePixelShader.hlsl" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="Content\SampleVertexShader.hlsl" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="Properties\Default.rd.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="TestApp_TemporaryKey.pfx" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.8" />
-    <PackageReference Include="TerraFX.Interop.Windows" Version="0.1.0-alpha-20190714.2" />
-  </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
 </Project>

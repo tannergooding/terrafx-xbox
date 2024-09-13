@@ -1,22 +1,23 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
-using TerraFX.Interop;
+using TerraFX.Interop.DirectX;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.ApplicationModel.Core;
 using Windows.Foundation;
 using Windows.Graphics.Display;
 using Windows.UI.Core;
-using static TerraFX.Interop.DXGI;
-using static TerraFX.Interop.DXGI_DEBUG_RLO_FLAGS;
-using static TerraFX.Interop.DXGIDebug;
-using static TerraFX.Interop.PIX;
-using static TerraFX.Interop.Windows;
+using static TerraFX.Interop.DirectX.DirectX;
+using static TerraFX.Interop.DirectX.DXGI;
+using static TerraFX.Interop.DirectX.DXGI_DEBUG_RLO_FLAGS;
+using static TerraFX.Interop.DirectX.PIX;
+using static TerraFX.Interop.Windows.IID;
+using static TerraFX.Interop.Windows.Windows;
 
 namespace TestApp
 {
     // Main entry point for our app. Connects the app with the Windows shell and handles application lifecycle events.
-    public sealed class App : IDisposable, IFrameworkView
+    public sealed partial class App : IDisposable, IFrameworkView
     {
         #region Fields
         private DeviceResources _deviceResources;
@@ -137,6 +138,11 @@ namespace TestApp
 
         private void OnWindowSizeChanged(CoreWindow sender, WindowSizeChangedEventArgs args)
         {
+            if (Main is null)
+            {
+                return;
+            }
+
             DeviceResources.LogicalSize = new Size(sender.Bounds.Width, sender.Bounds.Height);
             Main.OnWindowSizeChanged();
         }
